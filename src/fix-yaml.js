@@ -100,7 +100,6 @@ argv._.forEach(function(entry) {
         process(data.attributes, entry);
         console.log(data);
 
-        //console.log(util.inspect(data, false, 10, true));
     } catch (err) {
         console.log(err.stack || String(err));
         filesToFix.push(entry);
