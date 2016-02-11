@@ -9,6 +9,7 @@ var yaml = require('js-yaml');
 var argv = require('yargs')
     .usage('Usage: $0 <command> [options]')
     .alias('w', 'write-output').describe('w', 'Write fixed YAML front-matter back into the input file').boolean('w').default('w', false)
+    .alias('d', 'force-date-update').describe('d', 'Force update date field from filename').boolean('d').default('d', false)
 //    .alias('l', 'log-level').describe('l', 'Enable and set log level').boolean('l').default('l', false)
     .help('h')
     .alias('h', 'help')
@@ -29,6 +30,7 @@ var log = bunyan.createLogger({
 */
 
 var localWriteOutput = (argv.writeOutput === true);
+var localForceDate = (argv.forceDateUpdate === true);
 
 /* Add endsWith to String in ES5, if it doesn't exist */
 if (typeof String.prototype.endsWith !== 'function') {
@@ -37,10 +39,16 @@ if (typeof String.prototype.endsWith !== 'function') {
     };
 }
 
+Number.prototype.pad = function(size) {
+    var s = String(this);
+    while (s.length < (size || 2)) {s = "0" + s;}
+    return s;
+}
+
 Date.prototype.toYMDString = function() {
     return this.getFullYear() +
-        '-' + (this.getMonth() + 1) +
-        '-' + this.getDate();
+        '-' + (this.getMonth() + 1).pad() +
+        '-' + this.getDate().pad();
 };
 
 function writeCleanedPost(filename, data) {
@@ -95,7 +103,7 @@ function process(data, filename) {
         data.description = data.title;
     }
 
-    if (data.date === undefined) {
+    if ((localForceDate) || (data.date === undefined)) {
         date = getDateFromFileName(filename);
         data.date = date.toYMDString();
     }
