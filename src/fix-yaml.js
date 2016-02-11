@@ -47,9 +47,9 @@ function writeCleanedPost(filename, data) {
     fd = fs.openSync(filename, 'w');
 
     // write YAML front-matter
-    fs.writeSync(fd, '---');
+    fs.writeSync(fd, '---\n');
     fs.writeSync(fd, yaml.dump(data.attributes));
-    fs.writeSync(fd, '---');
+    fs.writeSync(fd, '---\n');
 
     // write body
     fs.writeSync(fd, data.body)
