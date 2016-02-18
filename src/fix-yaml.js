@@ -85,6 +85,14 @@ function shouldDelete(data, f) {
         return false;
     }
 
+    if (f === 'description') {
+        return false;
+    }
+
+    if (f === 'url') {
+        return false;
+    }
+
     if (f === 'date') {
         return false;
     }
@@ -97,6 +105,11 @@ function process(data, filename) {
         if (shouldDelete(data, f)) {
             delete data[f];
         }
+    }
+
+    if ((data.tags !== undefined) &&
+        (data.tags.indexOf(',') > -1)) {
+        data.tags = data.tags.split(/[\s,]+/);
     }
 
     if (data.description === undefined) {
@@ -124,7 +137,12 @@ argv._.forEach(function(entry) {
 
         data = fm(contents);
         process(data.attributes, entry);
-        console.log(yaml.dump(data.attributes));
+
+        if (typeof data.attributes.tags === 'string') {
+            console.log(entry + 'contains tags as a string. Split them using ",".');
+        }
+
+        //console.log(yaml.dump(data.attributes));
 
         if (localWriteOutput) {
             writeCleanedPost(filename, data)
