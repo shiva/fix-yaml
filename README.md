@@ -10,12 +10,18 @@ To install from npm, run
 
 ## Usage
 
-`fix-yaml args...`
+`fix-yaml [options] <list of files with YAML front-matter to fix>`
 
- - `args...`: a list of arguments
+Options:
+  -w, --write-output       Write fixed YAML front-matter back into the input file  [default: false]
+  -d, --force-date-update  Force update date field from filename                   [default: false]
+  -h, --help               Show help
  
 
 ## TODO
- - Support ability to over-write files
- - Support output file extension
- - 
+ - [x] Support ability to over-write files
+ - [ ] Support output file extension
+ - [x] Support updating date using file name
+ - [x] Autofix description, tags and categories
+ - [x] Remove YAML keys except the known ones 
+ - [ ] Make tag removal optional (atleast provide override to not strip unknown YAML keywords)
