@@ -1,5 +1,6 @@
 #!/usr/bin/env node
-//var bunyan = require('bunyan');
+
+var winston = require('winston');
 var fs = require('fs');
 var path = require('path');
 var util = require('util');
@@ -8,26 +9,27 @@ var yaml = require('js-yaml');
 
 var argv = require('yargs')
     .usage('Usage: $0 <command> [options]')
-    .alias('w', 'write-output').describe('w', 'Write fixed YAML front-matter back into the input file').boolean('w').default('w', false)
-    .alias('d', 'force-date-update').describe('d', 'Force update date field from filename').boolean('d').default('d', false)
-//    .alias('l', 'log-level').describe('l', 'Enable and set log level').boolean('l').default('l', false)
+    .alias('w', 'write-output')
+    .describe('w', 'Write fixed YAML front-matter into the input file.')
+    .boolean('w')
+    .default('w', false)
+    .alias('d', 'force-date-update')
+    .describe('d', 'Force update date field from filename.')
+    .boolean('d')
+    .default('d', false)
+    .alias('l', 'log-level')
+    .describe('l', 'Enable and set log level.')
+    .choices('l', ['info', 'debug', 'error'])
+    .default('l', 'error')
     .help('h')
     .alias('h', 'help')
     .demand(1)  // at least one file or more
 	.argv;
 
-/*
-var localLogLevel = bunyan.INFO;
-if (argv.logLevel) {
-    localLogLevel = bunyan.DEBUG;
+winston.level = 'error';
+if (argv.logLevel !== undefined) {
+    winston.level = argv.logLevel;
 }
-
-var log = bunyan.createLogger({
-    name: "fix-csv",
-    stream: process.stdout,
-    level : localLogLevel
-});
-*/
 
 var localWriteOutput = (argv.writeOutput === true);
 var localForceDate = (argv.forceDateUpdate === true);
@@ -130,7 +132,7 @@ argv._.forEach(function(entry) {
         return;
     }
 
-    console.log('\nProcessing : ' + entry);
+    winston.info('Processing : ' + entry);
     try {
         var filename = path.join(entry);
         var contents = fs.readFileSync(filename, 'utf8');
@@ -139,10 +141,9 @@ argv._.forEach(function(entry) {
         process(data.attributes, entry);
 
         if (typeof data.attributes.tags === 'string') {
-            console.log(entry + 'contains tags as a string. Split them using ",".');
+            winston.debug(entry + 'contains tags as a string. Split them using ",".');
         }
-
-        //console.log(yaml.dump(data.attributes));
+        winston.info(yaml.dump(data.attributes));
 
         if (localWriteOutput) {
             writeCleanedPost(filename, data)
